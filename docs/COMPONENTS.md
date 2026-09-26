@@ -12,14 +12,20 @@ See ARCHITECTURE.md for the authoritative layer diagram.
 
 ## Lib modules
 
-| Module | Role |
-|--------|------|
-| schema | Validate ProviderSnapshot |
-| aggregator | Merge, filter, counts, isolation |
-| capabilities | Helpers for UI section visibility |
-| badge | Attention → glyph/count |
-| format | Relative time, labels |
-| notifications | Urgency → toast policy |
+| Module | Role | Status |
+|--------|------|--------|
+| schema | Validate + normalize ProviderSnapshot | M1 ✅ |
+| aggregator | Merge, filter, counts, isolation | M1 ✅ |
+| capabilities | Helpers for UI section visibility | M1 ✅ |
+| errors | Lifecycle error taxonomy | M1 ✅ |
+| urgency | Urgency ranks + ordering | M1 ✅ |
+| badge | Attention → glyph/count | M2 |
+| format | Relative time, labels | M2 |
+| notifications | Urgency → toast policy | M2 |
+
+`tests/` + `scripts/run-domain-tests.sh` cover the M1 modules (ADR-015) and run
+without Noctalia or network access.
+
 
 ## Providers
 

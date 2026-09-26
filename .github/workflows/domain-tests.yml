@@ -1,0 +1,24 @@
+name: domain-tests
+
+# M1 domain gate (ADR-015): the same entrypoint developers run locally is the
+# one CI runs. Noctalia Runtime is not involved, so a plain Lua interpreter is
+# enough — `scripts/run-domain-tests.sh` prefers luau when it is available.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  domain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Lua interpreter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lua5.4
+
+      - name: Run domain tests
+        run: scripts/run-domain-tests.sh

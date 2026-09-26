@@ -47,6 +47,20 @@ capabilities = {
 }
 ```
 
+**Input aliasing (M1).** A provider that reports a forge-specific key is
+translated on input and the translation is reported back to the caller, so
+nothing is hidden:
+
+| Provider key in | Canonical key out |
+|-----------------|-------------------|
+| `pull_requests`, `merge_requests` | `work_items` |
+| `actions`, `pipelines` | `ci` |
+
+Output is canonical only: non-canonical and unknown keys never reach the model.
+If two aliases disagree for the same canonical key, `true` wins — the result must
+not depend on table iteration order (`lib/capabilities.luau`).
+
+
 ---
 
 ## 3. WorkItem identity & attention (ADR-010)
@@ -181,6 +195,22 @@ ProviderSnapshot = {
 ```
 
 `source_key` format: `"{provider}|{host}|{account}"` (lowercase host). Empty account when `auth_required` / `unavailable`: use `"_"` placeholder, e.g. `github|github.com|_`.
+
+### 6.1 Count semantics (M1)
+
+- `counts.attention` is always **recomputed** by the domain from `items`
+  (distinct `entity_id` where `attention == true`). A provider-supplied value that
+  disagrees is a *warning* in validation and is never published (REQ-D-005).
+- Other counters (`notifications`, `reviews`, `work_items`, `issues`, `ci`) are
+  **signal counts over all items** of that kind, so section badges can show
+  activity even when the signal is not part of the attention queue. A valid
+  reported counter is trusted; an invalid one falls back to the derived count.
+- `items` that fail the item contract (missing field, unknown kind/urgency, a
+  non-`http(s)` URL) make the whole source **error-severity invalid**: the source
+  is degraded to `bad_response` + `data_state = "empty"` and its items are not
+  published. Recoverable sloppiness (aliasable capability keys, wrong counters,
+  a newer `schema_version`) stays a `warn` and is repaired by normalization.
+
 
 ---
 
