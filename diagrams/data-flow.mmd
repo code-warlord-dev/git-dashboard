@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant User
+    participant Widget as widget.luau
+    participant Panel as panel.luau
+    participant Service as service.luau
+    participant Agg as DashboardAggregator
+    participant GH as GitHubProvider
+    participant GL as GitLabProvider
+    participant CLI as gh / glab / tea
+
+    User->>Widget: click
+    Widget->>Panel: noctalia.togglePanel(id)
+    Panel->>Panel: render(All tab from state)
+
+    Note over Service: Timer update() every refresh_interval_sec
+    Service->>GH: fetch (isolated)
+    Service->>GL: fetch (isolated)
+    GH->>CLI: runAsync argv (gh ...)
+    GL->>CLI: runAsync argv (glab ...)
+    CLI-->>GH: ProviderSnapshot or error
+    CLI-->>GL: ProviderSnapshot or error
+    GH-->>Agg: snapshot
+    GL-->>Agg: snapshot
+    Agg->>Agg: merge, capabilities, urgent
+    Agg-->>Service: aggregated overview
+    Service->>Service: state.set overview/providers/status/urgent
+    Service-->>Widget: state.watch urgent
+    Service-->>Panel: state.watch overview
+
+    User->>Panel: switch tab / mark / open URL
+    Panel->>Service: IPC mark-read provider id
+    Service->>GH: mark (if capability)
+    GH->>CLI: --mark-notification-read
+    Panel->>Panel: xdg-open url via runAsync

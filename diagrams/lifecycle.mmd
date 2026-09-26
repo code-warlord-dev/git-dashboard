@@ -1,0 +1,26 @@
+stateDiagram-v2
+    [*] --> Disabled
+    Disabled --> Enabled: plugins enable
+    Enabled --> ColdLoad: service start
+    ColdLoad --> ReadyStale: load pluginDataDir snapshot
+    ColdLoad --> Loading: no snapshot
+    ReadyStale --> Loading: timer / IPC refresh
+    Loading --> PartialReady: some providers ready
+    Loading --> Ready: all enabled providers ready
+    Loading --> AuthRequired: provider auth_required
+    Loading --> RateLimited: provider rate_limited
+    Loading --> NetworkError: provider network_error
+    Loading --> Error: provider api_error / bad_response
+    PartialReady --> Loading: timer
+    Ready --> Loading: timer
+    RateLimited --> Loading: timer
+    NetworkError --> Loading: timer / manual
+    Error --> Loading: timer / manual refresh
+    AuthRequired --> Loading: after CLI auth + refresh
+    Enabled --> Disabled: plugins disable
+
+    note right of PartialReady
+      Error isolation:
+      one provider down
+      does not blank dashboard
+    end note
