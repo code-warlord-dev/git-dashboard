@@ -55,6 +55,9 @@ Other REQ-* in SPEC: **not-yet-traced** until freeze. Expand rows when cases are
 | `bad_response` keeps last-good (a schema/parse failure is shown with a stale banner) | on demand | deliberate for M1: a non-empty dashboard beats a blank one; changing it is a single `Schema.POLICY` entry + one focused test (review P3.2) |
 | CI installs only `lua5.4`; the runner prefers `luau` when present | M2 | revisit when Luau-only constructs enter `lib/` |
 
-
-
-
+| REQ-N-005 | T-N-002, T-N-007, T-N-008 | M2 | planned |
+| REQ-N-009 | T-N-009 | M3 | planned |
+| REQ-S-005 | T-A-006 (+ per-source cases) | M1/M2 | planned |
+| REQ-U-018 | T-U-001 | M3 | planned |
+| REQ-U-019 | T-U-002 | M3 | planned |
+| REQ-C-015 | T-N-007 | M2/M3 | planned |

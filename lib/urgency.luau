@@ -66,4 +66,21 @@ function Urgency.compare(a, b)
     return id_a < id_b
 end
 
+
+-- Effective toast dedup window in minutes (ADR-016 / docs/NOTIFICATIONS.md).
+-- Optional settings keys: dedup_minutes, dedup_minutes_high, dedup_minutes_critical.
+function Urgency.dedup_window_minutes(urgency, settings)
+    settings = settings or {}
+    local base = settings.dedup_minutes or 30
+    local high = settings.dedup_minutes_high or 15
+    local critical = settings.dedup_minutes_critical or 5
+    if urgency == "critical" then
+        return critical
+    elseif urgency == "high" then
+        return high
+    else
+        return base
+    end
+end
+
 return Urgency

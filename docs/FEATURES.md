@@ -45,6 +45,11 @@ If Gitea has no Actions equivalent, the section is hidden or shows “Not availa
 
 ## 2. Tier A — Strong differentiators (M3–M5)
 
+
+### F-S6 · Auth recovery without tokens (ADR-018)
+On `auth_required` empty state: hotkey **`a`** opens terminal with `gh auth login` (argv only); after re-auth, restore focus to last `entity_id` kept in RAM.  
+**Why unique:** Keyboard triage survives session expiry without a plugin token store.
+
 ### F-A1 · Review Aging / SLA Hint
 For each pending review, show “waiting 2d 4h”. Optional soft highlight when older than user threshold (e.g. 48 h).  
 **Why unique:** Helps reviewers and authors fight review latency; rarely surfaced in bar plugins.
@@ -74,9 +79,10 @@ Temporarily filter entire dashboard to one repo (keyboard `f` then type). Clears
 
 ## 3. Tier B — Nice-to-have / post-1.0
 
-### F-B1 · Digest toast
-Instead of 5 separate toasts, one “3 new reviews · 1 CI failure” when multiple high-urgency items arrive in the same poll.  
-**Why unique:** Reduces notification fatigue further.
+### F-B1 · Digest toast (promoted — ADR-016)
+Instead of N separate toasts, one summary when multiple high/critical items share entity or burst window (“3 CI failures · org/repo · last 10m”).  
+**Normative:** ADR-016 / REQ-N-009 / NOTIFICATIONS.md §10. Target M3; optional earlier.  
+**Why unique:** Reduces fatigue without hiding critical repeats (pairs with urgency-aware dedup windows).
 
 ### F-B2 · PR size / risk badge
 If CLI can expose additions/deletions or file count, show a small “S / M / L” chip.  
@@ -117,7 +123,9 @@ If user configures a local or remote summarizer command, “Summarize this PR”
 
 | Feature | Earliest milestone | Notes |
 |---------|--------------------|-------|
-| F-S3 System toasts | M2 | With GitHub |
+| F-S3 System toasts + urgency-aware dedup | M2 | ADR-016 windows |
+| F-S6 Auth recovery hotkey | M2 soft / M3 | ADR-018 |
+| F-B1 Digest toast | M3 | ADR-016 |
 | F-S4 Stale banner | M2 | Core |
 | F-S5 Capability honesty | M1–M2 | Architecture |
 | F-S2 Keyboard triage | M2 foundation, M3 full | |

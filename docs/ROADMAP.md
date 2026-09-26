@@ -2,7 +2,7 @@
 
 **Canonical id:** `code-warlord-dev/git-dashboard`  
 **Delivery model:** Vertical slices on multi-provider architecture  
-**Last updated:** 2026-09-26 (M0.5)
+**Last updated:** 2026-09-26 (ADR-016…018)
 
 ---
 
@@ -101,7 +101,7 @@ criteria carry a status. Updated only when work lands on `main`.
 | Phase | Stages | SPEC focus |
 |-------|--------|------------|
 | M2.1 Scaffold | plugin.toml (id, plugin_api per pin / ≥24 when argv required), service/widget/panel stubs, lib layout | REQ-P-001 |
-| M2.2 Service orchestration | Poll timer, runAsync argv collectors, publish to noctalia.state | REQ-S-001 … REQ-S-006 |
+| M2.2 Service orchestration (per-source refresh ADR-017) | Poll timer, runAsync argv collectors, publish to noctalia.state | REQ-S-001 … REQ-S-006 |
 | M2.3 GitHubProvider | Identity, notifications, reviews, PRs, issues via `gh` | REQ-G-001 … REQ-G-012 |
 | M2.4 Widget | Badge (urgent + counts), click → togglePanel | REQ-W-001 … REQ-W-004 |
 | M2.5 Panel shell | All \| GitHub tabs, lists, open URL, explicit error banners | REQ-U-001 … REQ-U-010 |
@@ -132,7 +132,8 @@ criteria carry a status. Updated only when work lands on `main`.
 | M3.1 Mark-read | Single + mark-all; optimistic UI; re-sync | REQ-G-013 … REQ-G-016 |
 | M3.2 Actions | Recent workflow runs, open URL, cost control setting | REQ-G-017 … REQ-G-020 |
 | M3.3 Contributions | Activity / contribution graph (feature-flagged) | REQ-G-021 … REQ-G-023 |
-| M3.4 Keyboard | Full keyboard navigation + vim-like subset | REQ-U-011 … REQ-U-015 |
+| M3.4 Keyboard | Full keyboard + auth recovery hotkey `a` + focus restore | REQ-U-011 … REQ-U-015, REQ-U-018, REQ-U-019 |
+| M3.4b Digest toasts | F-B1 digest when burst of high/critical | REQ-N-009, REQ-C-016 |
 | M3.5 Settings schema | enabled_providers, intervals, notification prefs, action_scan | REQ-C-001 … REQ-C-008 |
 | M3.6 i18n + lint | translations/en.json, noctalia plugins lint clean | — |
 

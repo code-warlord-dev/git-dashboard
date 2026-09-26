@@ -31,6 +31,7 @@ local test_files = {
     "./test_schema",
     "./test_aggregator",
     "./test_stale_policy",
+    "./test_urgency_dedup",
 }
 
 for _, file in ipairs(test_files) do

@@ -36,3 +36,10 @@ Progress markers per AGENTS.md §13.1: ✅ done (merged + verified) · 🟡 in p
 ## M2+
 - [ ] per ROADMAP after gates
 
+## Expert review 2026-09-26 (docs)
+- [x] ADR-016 urgency-aware dedup + digest path
+- [x] ADR-017 per-source refresh / grace
+- [x] ADR-018 auth recovery UX
+- [x] SPEC / NOTIFICATIONS / FEATURES / USER / CHANGELOG synced
+- [ ] Push to origin + optional PR
+- [ ] Domain test for Urgency.dedup_window_minutes
