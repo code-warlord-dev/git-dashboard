@@ -92,6 +92,13 @@ Aggregated overview MUST carry `schema_version` and `fetched_at` (max of constit
 ### REQ-A-009 — Stale policy
 Configurable last-good window (default 30 min). Beyond window, privileged lists MAY be cleared on `auth_required`; on `rate_limited` / `network_error` last-good is preferred with banner.
 
+**M1 implementation notes:** `data_state` is written only by `Schema.apply_success()` /
+`Schema.apply_failure()`; the window is `Schema.STALE_WINDOW_SEC` (overridable per
+call), `stale_expired = true` marks last-good past the window, and ADR-012 (clear on
+`auth_required`) is the stricter rule and wins. Banner input:
+`Schema.staleness(snapshot, now)`. Test: `T-A-007`.
+
+
 ### REQ-A-010 — Isolation under dual providers (M4)
 When both GitHub and GitLab are enabled, auth failure on one MUST leave the other fully functional.
 
@@ -124,6 +131,13 @@ After aggregation, service MUST publish the unified overview to `noctalia.state`
 Providers MAY be refreshed sequentially or with bounded concurrency (max 2 recommended).  
 Each refresh has a monotonic `refresh_id`; only results for the current accepted id may publish. Late results discarded.  
 Per-provider timeout default 30s; overall refresh budget default 60s. On timeout: `network_error` or keep last-good with `data_state=stale`.
+
+**M1 implementation notes:** `Aggregator:begin_refresh()` issues the monotonic id,
+`Aggregator:accepts_generation(id)` and `Aggregator:publish(snapshots, id)` are the only
+gate to the published overview (`nil, "stale_generation"` for late results), and
+`Aggregator.PROVIDER_TIMEOUT_SEC` / `Aggregator.REFRESH_BUDGET_SEC` expose the defaults.
+Test: `T-A-006`.
+
 
 ### REQ-S-006 — Redaction
 Collector stderr / stdout that may contain tokens MUST be redacted before any logging.
@@ -427,8 +441,8 @@ Initial planned (M1):
 | T-A-003 | Filter by provider | M1 |
 | T-A-004 | Capability hide | M1 |
 | T-A-005 | Attention entity dedup | M1 |
-| T-A-006 | refresh_id late-result discard | M1.4 |
-| T-A-007 | Last-good window / stale policy | M1.4 |
+| T-A-006 | refresh_id late-result discard | M1 |
+| T-A-007 | Last-good window / stale policy | M1 |
 | T-A-006 | refresh_id late-result discard | M1 |
 
 M2+ tests (T-S-*, T-G-*, T-N-*) are listed in TRACEABILITY.md when collector contracts freeze.

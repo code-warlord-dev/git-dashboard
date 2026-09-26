@@ -56,9 +56,13 @@ function Aggregator.new(opts)
         schema_version = opts.schema_version or Schema.VERSION,
         stale_window_sec = opts.stale_window_sec or Aggregator.DEFAULT_STALE_WINDOW_SEC,
         now = opts.now,
+        -- `current_refresh_id` is the generation being collected; results tagged
+        -- with it are the only ones allowed to publish (ADR-013).
+        current_refresh_id = opts.refresh_id or 0,
         accepted_refresh_id = opts.refresh_id or 0,
     }, DashboardAggregator)
 end
+
 
 function Aggregator.mode_key(mode)
     if mode == nil or mode == Aggregator.MODE_ALL then
@@ -183,6 +187,7 @@ local function build_source(raw)
         state = normalized.state,
         data_state = normalized.data_state,
         stale_since = normalized.stale_since,
+        stale_expired = normalized.stale_expired,
         capabilities = normalized.capabilities,
         counts = normalized.counts,
         items = normalized.items,
@@ -404,6 +409,68 @@ end
 function Aggregator.merge(snapshots, opts)
     return Aggregator.new(opts):merge(snapshots, opts)
 end
+
+-- Default refresh budget per provider and per cycle (REQ-S-005).
+Aggregator.PROVIDER_TIMEOUT_SEC = 30
+Aggregator.REFRESH_BUDGET_SEC = 60
+
+--[[
+begin_refresh() -> refresh_id
+
+Starts a monotonic generation (ADR-013). Once it returns, results tagged with an
+older generation must be discarded, so bounded concurrency cannot overwrite newer
+state with older collector output.
+]]
+function DashboardAggregator:begin_refresh()
+    self.current_refresh_id = (self.current_refresh_id or 0) + 1
+    return self.current_refresh_id
+end
+
+-- Only results of the current generation may mutate the published overview.
+function DashboardAggregator:accepts_generation(refresh_id)
+    return refresh_id ~= nil and refresh_id == self.current_refresh_id
+end
+
+--[[
+publish(snapshots, refresh_id, opts) -> overview | nil, reason
+
+Publishes only current-generation results. Late results (a provider that answered
+after a newer refresh started) get `nil, "stale_generation"` instead of
+overwriting newer state (REQ-S-005 / ADR-013). `refresh_id == nil` means "current
+generation".
+]]
+function DashboardAggregator:publish(snapshots, refresh_id, opts)
+    local generation = refresh_id
+    if generation == nil then
+        generation = self.current_refresh_id
+    end
+    if not self:accepts_generation(generation) then
+        return nil, "stale_generation"
+    end
+    self.accepted_refresh_id = generation
+    return self:merge(snapshots, {
+        published_at = opts and opts.published_at,
+        refresh_id = generation,
+    })
+end
+
+--[[
+budget_exceeded(started_at, now, budget_sec?) -> bool
+provider_timed_out(started_at, now) -> bool
+
+Refresh timeouts (REQ-S-005): 30s per provider, 60s per cycle by default. On expiry
+the service classifies the collector as timed out / `network_error` and keeps
+last-good through Schema.apply_failure.
+]]
+function Aggregator.budget_exceeded(started_at, now, budget_sec)
+    local budget = budget_sec or Aggregator.REFRESH_BUDGET_SEC
+    return (now - started_at) > budget
+end
+
+function Aggregator.provider_timed_out(started_at, now)
+    return (now - started_at) > Aggregator.PROVIDER_TIMEOUT_SEC
+end
+
 
 --[[
 filter(overview, mode) -> overview   (REQ-A-006)

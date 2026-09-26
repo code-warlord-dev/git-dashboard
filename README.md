@@ -98,9 +98,11 @@ plugin.toml     + service.luau / widget.luau / panel.luau (M2)
 .github/        PR template + domain-tests workflow
 ```
 
-**Status:** the M1 domain core is implemented and covered by 29 cases
-(`29 passed, 0 failed`). M2 (plugin scaffold + GitHubProvider) is gated on the
-Noctalia pin (`docs/VERSION-MAP.md` G-API-1…3).
+**Status:** M1 (domain core — `lib/` and `tests/`) is implemented and covered by
+**42 cases** (`42 passed, 0 failed` on `lua5.4`, `lua` 5.5 and `luajit`). The
+`v0.1.0` tag follows the release PR. M2 (plugin scaffold + GitHubProvider) is gated
+on the Noctalia pin (`docs/VERSION-MAP.md` G-API-1…3).
+
 
 **Run the domain tests:**
 

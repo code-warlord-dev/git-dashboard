@@ -28,6 +28,13 @@ Completion of a milestone requires its exit criteria plus a bullet here.
   `scripts/run-domain-tests.sh` entrypoint and the `domain-tests` CI workflow.
   The suite runs on `luau`, `lua5.4`, `lua` and `luajit` with no Noctalia or
   network access.
+- **M1.4 stale policy + refresh generations** — `Schema.POLICY`,
+  `Schema.apply_success()` / `Schema.apply_failure()` (last-good window, `stale_expired`,
+  clear-on-auth), `Schema.staleness()` banner input, `Schema.should_discard_last_good()`
+  retention, `Aggregator:begin_refresh()` / `accepts_generation()` / `publish()` plus
+  `PROVIDER_TIMEOUT_SEC` / `REFRESH_BUDGET_SEC`; 13 new cases (T-A-006, T-A-007) —
+  **42 passed, 0 failed**.
+
 
 ### Changed
 

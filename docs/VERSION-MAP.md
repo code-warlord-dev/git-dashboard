@@ -4,6 +4,10 @@
 |---------|-----|-----------|----------------------|-------|
 | 0.0.0 | — | M0 / M0.5 | any | docs + contract hardening |
 | 0.1.0 | v0.1.0 | M1 | — | domain lib / aggregator tests |
+
+**Status:** 0.1.0 is code-complete on `main` (M1.1–M1.4). The `v0.1.0` tag is issued by
+the release PR (`chore(release): 0.1.0`) after human approval — no tag on a branch.
+
 | 0.2.0 | v0.2.0 | M2 | **release pin required** | first loadable plugin, GitHub MVP, system notifications |
 | 0.3.0 | v0.3.0 | M3 | pin | mark-read, CI section, contributions, keyboard, full settings |
 | 0.4.0 | v0.4.0 | M4 | pin | GitLabProvider |

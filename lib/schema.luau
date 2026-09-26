@@ -59,6 +59,34 @@ Schema.ITEM_FIELDS = {
 -- States in which identity may legitimately be empty (REQ-D-010).
 Schema.ANONYMOUS_STATES = { auth_required = true, unavailable = true }
 
+--[[
+Stale policy constants (REQ-A-009 / ADR-011 / ADR-012).
+
+`data_state` is derived by the domain, never guessed by a provider:
+  success                    -> "fresh"
+  failure + usable last-good -> "stale" (+ `stale_expired` past the window)
+  failure + nothing to serve -> "empty"
+  auth_required/unavailable  -> "empty" and privileged items cleared
+
+ADR-012 is the stricter rule and wins over REQ-A-009's optional "may keep
+last-good inside the window" behaviour for an unauthenticated source.
+]]
+Schema.STALE_WINDOW_SEC = 30 * 60
+Schema.LAST_GOOD_MAX_AGE_SEC = 24 * 60 * 60
+
+-- Which failures keep last-good on screen and which clear it.
+Schema.POLICY = {
+    ready = "fresh",
+    auth_required = "clear",
+    unavailable = "clear",
+    rate_limited = "serve_stale",
+    network_error = "serve_stale",
+    api_error = "serve_stale",
+    bad_response = "serve_stale",
+    loading = "serve_stale",
+}
+
+
 local function contains(list, value)
     for _, entry in ipairs(list) do
         if entry == value then
@@ -279,6 +307,7 @@ function Schema.normalize(snapshot)
         message = tostring(source.message or ""),
         error = type(source.error) == "table" and source.error or nil,
         stale_since = is_integer(source.stale_since) and source.stale_since or nil,
+        stale_expired = source.stale_expired == true or nil,
     }
     normalized.source_key = source.source_key
         or Schema.source_key(normalized.provider, normalized.host, normalized.account)
@@ -342,6 +371,11 @@ function Schema.validate(snapshot)
 
     if snapshot.data_state ~= nil and not Errors.is_data_state(snapshot.data_state) then
         problem("error", "unknown_data_state", "data_state", "unknown data_state: " .. tostring(snapshot.data_state))
+    end
+
+    if snapshot.stale_expired == true and snapshot.data_state ~= "stale" then
+        problem("warn", "stale_expired_without_stale_data", "stale_expired",
+            "stale_expired only applies when data_state == \"stale\"")
     end
 
     -- REQ-D-010: identity is only allowed to be empty when not authenticated.
@@ -414,5 +448,135 @@ function Schema.validate(snapshot)
 end
 
 
+-- Policy for a lifecycle state. Unknown states keep last-good rather than
+-- discarding data because of an unclassified error.
+function Schema.policy_for(state)
+    return Schema.POLICY[state] or "serve_stale"
+end
+
+--[[
+staleness(snapshot, now, window_sec?) -> { data_state, age_sec, stale_since, expired }
+
+Banner input for the widget/panel, derived from the model alone (REQ-A-007): the UI
+never needs to know which provider produced the snapshot.
+]]
+function Schema.staleness(snapshot, now, window_sec)
+    local window = window_sec or Schema.STALE_WINDOW_SEC
+    local is_table = type(snapshot) == "table"
+    local fetched_at = (is_table and snapshot.fetched_at) or 0
+    local age = (now or 0) - fetched_at
+    if age < 0 then
+        age = 0
+    end
+    local data_state = is_table and snapshot.data_state or "empty"
+    return {
+        data_state = data_state,
+        age_sec = age,
+        stale_since = is_table and snapshot.stale_since or nil,
+        expired = data_state == "stale" and age > window,
+    }
+end
+
+local function shallow_copy(snapshot)
+    local copy = {}
+    for key, value in pairs(snapshot) do
+        copy[key] = value
+    end
+    return copy
+end
+
+--[[
+apply_success(snapshot, now) -> snapshot
+
+A successful fetch: fresh data, no error, no staleness markers.
+]]
+function Schema.apply_success(snapshot, now)
+    local updated = shallow_copy(type(snapshot) == "table" and snapshot or {})
+    updated.state = "ready"
+    updated.data_state = "fresh"
+    updated.stale_since = nil
+    updated.stale_expired = nil
+    updated.error = nil
+    if now ~= nil then
+        updated.fetched_at = now
+        updated.last_attempt_at = now
+    end
+    return updated
+end
+
+--[[
+apply_failure(snapshot, failure, opts) -> snapshot
+
+failure = { state, error?, message? }  (state from Errors.classify)
+opts    = { now?, stale_window_sec? }
+
+Never mutates the input. Returns a new snapshot whose `data_state` follows the
+policy table:
+  * clear policy        -> items/activity dropped, counts zeroed, no stale markers;
+  * serve_stale + items -> `data_state = "stale"`, `stale_expired` past the window;
+  * nothing to serve    -> `data_state = "empty"`.
+
+This is where "one bad provider must not poison others" becomes concrete: the
+service calls this per source and publishes the result, so a rate-limited provider
+keeps its last-good while an unauthenticated one publishes nothing.
+]]
+function Schema.apply_failure(snapshot, failure, opts)
+    opts = opts or {}
+    local base = type(snapshot) == "table" and snapshot or Schema.normalize({})
+    local updated = shallow_copy(base)
+    local state = (failure and failure.state) or "api_error"
+
+    updated.state = state
+    if opts.now ~= nil then
+        updated.last_attempt_at = opts.now
+    end
+    if failure and failure.error ~= nil then
+        updated.error = failure.error
+    end
+    if failure and failure.message ~= nil then
+        updated.message = failure.message
+    end
+
+    local items = type(updated.items) == "table" and updated.items or {}
+    if Schema.policy_for(state) == "clear" or #items == 0 then
+        updated.data_state = "empty"
+        updated.items = {}
+        updated.activity = {}
+        updated.counts = Schema.new_counts()
+        updated.stale_since = nil
+        updated.stale_expired = nil
+        return updated
+    end
+
+    local window = opts.stale_window_sec or Schema.STALE_WINDOW_SEC
+    local reference = opts.now or base.fetched_at or 0
+    updated.data_state = "stale"
+    updated.stale_since = base.stale_since or opts.now
+    updated.stale_expired = (reference - (base.fetched_at or 0)) > window
+    return updated
+end
+
+--[[
+should_discard_last_good(snapshot, now, opts) -> bool
+
+Retention (DATA-MODEL §11): a persisted last-good older than
+`last_good_max_age_sec` (default 24h) — or without a usable timestamp — must be
+discarded on load instead of being merged into the next overview.
+]]
+function Schema.should_discard_last_good(snapshot, now, opts)
+    opts = opts or {}
+    if type(snapshot) ~= "table" then
+        return true
+    end
+    local fetched_at = snapshot.fetched_at
+    if type(fetched_at) ~= "number" or fetched_at <= 0 then
+        return true
+    end
+    local max_age = opts.last_good_max_age_sec or Schema.LAST_GOOD_MAX_AGE_SEC
+    return ((now or 0) - fetched_at) > max_age
+end
+
+
 return Schema
+
 
