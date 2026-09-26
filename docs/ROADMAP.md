@@ -12,28 +12,38 @@
 2. Ship usable Core + GitHub before GitLab / Gitea.
 3. Every milestone has exit criteria tied to SPEC REQ-* and T-*.
 4. One milestone **in progress** at a time unless human parallelizes.
-5. Completing a milestone requires its exit criteria + PROGRESS.md checkboxes + CHANGELOG bullet.
+5. Completing a milestone requires its exit criteria + `PROGRESS.md` checkboxes + ROADMAP phase status + CHANGELOG bullet (AGENTS.md §13.1).
+
+**Progress markers (AGENTS.md §13.1)** — phase tables, the milestone overview and exit
+criteria carry a status. Updated only when work lands on `main`.
+
+| Marker | Meaning |
+|--------|---------|
+| ✅ done | Merged to `main` and verified (tests / CI) |
+| 🟡 in progress | Branch or PR open, not merged |
+| ⬜ planned | Not started |
 
 ---
 
 ## 2. Milestone overview
 
-| Milestone | Name | Focus | Target version |
-|-----------|------|-------|----------------|
-| **M0** | Foundations | Docs, AGENTS, skills, SPEC skeleton, ADRs | 0.0.0 |
-| **M0.5** | Contract hardening | ADR-009…014, audit fixes, honest inventory, gates | 0.0.0 |
-| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 |
-| **M2** | MVP Plugin + GitHub | service + widget + panel + GitHubProvider + system notifications | 0.2.0 |
-| **M3** | GitHub polish + Settings | Mark-read, Actions, contributions, keyboard, settings schema | 0.3.0 |
-| **M4** | GitLab | GitLabProvider, independent isolation, All | GitHub | GitLab tabs | 0.4.0 |
-| **M5** | Gitea + Capability honesty | GiteaProvider, hide/unavailable sections | 0.5.0 |
-| **M6** | Multi-host + Stable 1.0 | host → identity → capabilities, freeze contracts | 1.0.0 |
+| Milestone | Name | Focus | Target version | Status |
+|-----------|------|-------|----------------|--------|
+| **M0** | Foundations | Docs, AGENTS, skills, SPEC skeleton, ADRs | 0.0.0 | ✅ done (PR #1) |
+| **M0.5** | Contract hardening | ADR-009…014, audit fixes, honest inventory, gates | 0.0.0 | ✅ done (PR #1) |
+| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 | 🟡 in progress (M1.1/M1.2 merged in PR #2; M1.4 open) |
+| **M2** | MVP Plugin + GitHub | service + widget + panel + GitHubProvider + system notifications | 0.2.0 | ⬜ planned (blocked on G-API-1…3 pin) |
+| **M3** | GitHub polish + Settings | Mark-read, Actions, contributions, keyboard, settings schema | 0.3.0 | ⬜ planned |
+| **M4** | GitLab | GitLabProvider, independent isolation, All | GitHub | GitLab tabs | 0.4.0 | ⬜ planned |
+| **M5** | Gitea + Capability honesty | GiteaProvider, hide/unavailable sections | 0.5.0 | ⬜ planned |
+| **M6** | Multi-host + Stable 1.0 | host → identity → capabilities, freeze contracts | 1.0.0 | ⬜ planned |
+
 
 ---
 
 ## 3. Detailed milestones → phases → stages
 
-### M0 — Foundations (docs only)
+### M0 — Foundations (docs only) ✅ done — PR #1
 
 **Goal:** Complete operating contract so any agent can start without re-deriving architecture.
 
@@ -48,10 +58,10 @@
 
 **Exit criteria**
 
-- [ ] All docs listed in package README exist and are cross-linked
-- [ ] AGENTS.md activation matrix covers P0–P3 tasks
-- [ ] At least 5 project skills have valid SKILL.md
-- [ ] PROGRESS.md M0 checkboxes can be marked
+- [x] All docs listed in package README exist and are cross-linked *(PR #1)*
+- [x] AGENTS.md activation matrix covers P0–P3 tasks *(PR #1)*
+- [x] At least 5 project skills have valid SKILL.md *(PR #1)*
+- [x] PROGRESS.md M0 checkboxes can be marked *(PR #1)*
 
 ---
 
@@ -61,20 +71,22 @@
 
 **Phases**
 
-| Phase | Stages | SPEC focus |
-|-------|--------|------------|
-| M1.1 Schema | ProviderSnapshot schema v1, capability flags, error taxonomy | REQ-D-001 … REQ-D-010 |
-| M1.2 Aggregator | DashboardAggregator: merge, filter, counts, isolation | REQ-A-001 … REQ-A-008 |
-| M1.3 Tests | T-D-* and T-A-* unit tests (fixtures, no CLI) | T-D-001 … T-A-006 |
-| M1.4 Stale policy | Last-good window, banner rules | REQ-A-009 |
+| Phase | Stages | SPEC focus | Status |
+|-------|--------|------------|--------|
+| M1.1 Schema | ProviderSnapshot schema v1, capability flags, error taxonomy | REQ-D-001 … REQ-D-010 | ✅ done — PR #2 |
+| M1.2 Aggregator | DashboardAggregator: merge, filter, counts, isolation | REQ-A-001 … REQ-A-008 | ✅ done — PR #2 |
+| M1.3 Tests | T-D-* and T-A-* unit tests (fixtures, no CLI) | T-D-001 … T-A-007 | 🟡 in progress — part 1 merged (T-D-001…005, T-A-001…005, 29 cases); T-A-006/T-A-007 with M1.4 |
+| M1.4 Stale policy | Last-good window, banner rules, refresh generation | REQ-A-009, REQ-S-005 | ⬜ planned |
 
 **Exit criteria**
 
-- [ ] Aggregator accepts 0..N ProviderSnapshots and produces unified overview
-- [ ] Capability hide rules unit-tested
-- [ ] Error isolation unit-tested (one bad provider does not poison All)
-- [ ] Schema version field present
-- [ ] Domain free of Noctalia and forge-specific types
+- [x] Aggregator accepts 0..N ProviderSnapshots and produces unified overview *(T-A-001, PR #2)*
+- [x] Capability hide rules unit-tested *(T-A-004, PR #2)*
+- [x] Error isolation unit-tested (one bad provider does not poison All) *(T-A-002, PR #2)*
+- [x] Schema version field present *(T-D-001, PR #2)*
+- [x] Domain free of Noctalia and forge-specific types *(lib/ requires only siblings, PR #2)*
+
+**Remaining before the milestone closes:** M1.4 (`REQ-A-009` → `T-A-007`, `REQ-S-005`/ADR-013 → `T-A-006`), then tag `v0.1.0`.
 
 **Version:** 0.1.0 (domain lib / tests)
 

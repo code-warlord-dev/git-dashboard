@@ -83,16 +83,26 @@ git-dashboard/
 ├── widget.luau
 ├── panel.luau
 ├── lib/
-│   ├── schema.luau                # ProviderSnapshot validation
-│   ├── aggregator.luau            # DashboardAggregator
-│   ├── capabilities.luau
-│   ├── badge.luau
-│   ├── format.luau
-│   └── notifications.luau         # urgency → toast mapping
+│   ├── schema.luau                # ProviderSnapshot v1: normalize + validate (M1)
+│   ├── aggregator.luau            # DashboardAggregator: merge / filter / counts (M1)
+│   ├── capabilities.luau          # canonical keys, capability-honest sections (M1)
+│   ├── errors.luau                # lifecycle error taxonomy (M1, ADR-004/011)
+│   ├── urgency.luau               # urgency ranks + ordering (M1, DATA-MODEL §5)
+│   ├── badge.luau                 # (M2)
+│   ├── format.luau                # (M2)
+│   └── notifications.luau         # urgency → toast mapping (M2)
 ├── providers/
 │   ├── github.luau
 │   ├── gitlab.luau                # (M4)
 │   └── gitea.luau                 # (M5)
+├── tests/                         # pure domain tests + fixtures (M1, ADR-015)
+│   ├── harness.luau               # minimal assertion harness (no Noctalia)
+│   ├── run.luau                   # suite entrypoint
+│   ├── fixtures.luau              # plain-data ProviderSnapshots
+│   ├── test_schema.luau           # T-D-001 … T-D-005
+│   └── test_aggregator.luau       # T-A-001 … T-A-005
+├── scripts/
+│   └── run-domain-tests.sh        # ADR-015 test entrypoint (local + CI)
 ├── bin/                           # optional CLI helpers (testable)
 │   ├── github-fetch
 │   ├── gitlab-fetch
@@ -101,6 +111,12 @@ git-dashboard/
 ├── thumbnail.webp
 └── README.md
 ```
+
+**M1 status:** `schema`, `aggregator`, `capabilities`, `errors`, `urgency` are
+implemented and covered by the `tests/` suite (`scripts/run-domain-tests.sh`).
+They import nothing from Noctalia and nothing from a forge SDK (REQ-D-007), and
+they are the only modules the UI may depend on.
+
 
 **Canonical id:** `code-warlord-dev/git-dashboard`  
 **Entry addresses:**

@@ -1,11 +1,13 @@
 # Session State
-Updated: 2026-09-26T03:00:00Z
-Human goal: Close re-audit P0/P1 (M0.5-final)
-Active milestone: M0.5 → ready for M1
-Branch: none (docs)
-PR: none
-Blocked: none for M1; G-API pin blocks M2 only
-Next action: M1 domain implementation (schema + aggregator + ADR-015 harness)
-SPEC focus: REQ-D-*, REQ-A-*, REQ-C-009…014
-Open questions: Noctalia pin tag (pre-M2 only)
-Last artifact: git-dashboard-full-docs post re-audit
+Updated: 2026-09-26T01:10:00Z
+Human goal: Close M1 domain milestone, then M2 after the Noctalia pin
+Active milestone: M1 — M1.1 + M1.2 merged, M1.4 next
+Branch: main (next branch: feat/m1.4-stale-policy)
+PR: #2 merged (squash) into main
+Blocked: none for M1; G-API-1…3 pin blocks M2 only
+Next action: M1.4 — last-good window (REQ-A-009 → T-A-007) + refresh generation (ADR-013 → T-A-006)
+SPEC focus: REQ-A-009, REQ-S-005, REQ-D-009 (stale meta-state)
+Open questions: Noctalia pin tag/commit + real `gh` stdout fixtures (pre-M2)
+Last artifact: main = M1.1 + M1.2 (29 domain tests green, CI `domain-tests` pass)
+
+

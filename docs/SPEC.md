@@ -427,6 +427,8 @@ Initial planned (M1):
 | T-A-003 | Filter by provider | M1 |
 | T-A-004 | Capability hide | M1 |
 | T-A-005 | Attention entity dedup | M1 |
+| T-A-006 | refresh_id late-result discard | M1.4 |
+| T-A-007 | Last-good window / stale policy | M1.4 |
 | T-A-006 | refresh_id late-result discard | M1 |
 
 M2+ tests (T-S-*, T-G-*, T-N-*) are listed in TRACEABILITY.md when collector contracts freeze.
