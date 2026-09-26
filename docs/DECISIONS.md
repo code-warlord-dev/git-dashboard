@@ -1,6 +1,6 @@
 # DECISIONS.md — Architecture Decision Records
 
-**Last updated:** 2026-09-26 (M0.5)
+**Last updated:** 2026-09-26 (ADR-016…018 expert review)
 
 Format: short ADR. New design changes require a new ADR + SPEC update in the same PR.
 
@@ -156,22 +156,42 @@ Format: short ADR. New design changes require a new ADR + SPEC update in the sam
 ## ADR-012 — Persistence and auth invalidation
 
 **Status:** Accepted  
-**Date:** 2026-09-26
+**Date:** 2026-09-26  
+**Updated:** 2026-09-26 (expert review — keyboard flow)
 
-**Decision:** On `auth_required` for a `source_key`: clear memory, invalidate that last-good entry, publish empty privileged lists. Do not restore private last-good until authenticated again. Retention: max age 24h default; max items per kind.
+**Decision:** On `auth_required` for a `source_key`:
+1. Clear **privileged** in-memory items (titles, repos, URLs, account strings for that source).
+2. Invalidate matching `last-good.json` entry.
+3. Publish overview with `state=auth_required`, `data_state=empty` for that source.
+4. Do **not** restore privileged last-good until a successful authenticated fetch.
 
-**Consequences:** Prevents private repo metadata flash after logout / account switch.
+**May retain in RAM only (non-privileged UI continuity — ADR-018):**
+- last focused `entity_id` / section id for panel restore after re-auth;
+- UI mode tab (All / provider);
+- non-secret settings already known from config.
+
+**Must not retain while `auth_required`:** item titles, repo names, URLs, or any ghost privileged list rows.
+
+Disk retention defaults: max age 24h; max items per kind.
+
+**Consequences:** Privacy preserved; keyboard triage can resume position after re-auth without token storage.
 
 ---
 
 ## ADR-013 — Refresh generation / async result ordering
 
 **Status:** Accepted  
-**Date:** 2026-09-26
+**Date:** 2026-09-26  
+**Updated:** 2026-09-26 (see ADR-017)
 
-**Decision:** Each refresh cycle has a monotonic `refresh_id`. Provider results are tagged with the id that started them. Only results matching the **currently accepted** refresh_id may mutate the published overview. Late results from older generations are discarded. Per-provider timeout (default 30s) and overall refresh budget (default 60s) apply; on timeout treat as `network_error` or keep previous with stale if last-good exists.
+**Decision (base + per-source):**
+1. Global monotonic `refresh_id` identifies a service refresh cycle.
+2. Each **source** tracks `source_refresh_id` (per `source_key`) so a slow source cannot block publishing of faster sources (ADR-017).
+3. A result may update that source’s snapshot only if its generation is still the accepted one for that source.
+4. Defaults: per-source timeout **30s**; optional **grace** until the next poll tick for a late result of the same source generation (ADR-017). Overall wall budget default **90s**.
+5. On hard timeout with no result: `network_error` or keep last-good with `data_state=stale` **for that source only** — other sources stay fresh if they completed.
 
-**Consequences:** Bounded concurrency cannot overwrite newer state with older CLI output.
+**Consequences:** No cross-source pollution; fewer false yellow banners from one slow forge.
 
 ---
 
@@ -202,3 +222,68 @@ Format: short ADR. New design changes require a new ADR + SPEC update in the sam
 4. **Future:** may adopt an ecosystem runner (e.g. community Luau test lib) via a new ADR; not required for M1.
 
 **Consequences:** Implementer can write T-D-001… / T-A-001… without waiting for Noctalia pin. Test runner choice is frozen for M1; changing it needs ADR update.
+
+---
+
+## ADR-016 — Urgency-aware toast deduplication
+
+**Status:** Accepted  
+**Date:** 2026-09-26
+
+**Context:** A fixed `dedup_minutes = 30` for every event suppresses a second CI failure after a quick failed fix inside the window — the user believes the build is green. Expert review: a uniform window breaks the critical feedback loop.
+
+**Decision:**
+
+1. `notifications.dedup_minutes` (default 30) is the base window for **normal** and **low**.
+2. Effective window depends on urgency rank:
+
+| urgency | rank | Default effective window |
+|---------|-----:|--------------------------|
+| critical | 4 | **5 min** (`notifications.dedup_minutes_critical`) |
+| high | 3 | **15 min** (`notifications.dedup_minutes_high`) |
+| normal | 2 | `notifications.dedup_minutes` (30) |
+| low | 1 | `notifications.dedup_minutes` (30) |
+
+3. Dedup key remains signal `id`. A new CI run with a new native run id is a new `id` and is never suppressed by a previous run’s id. When the forge reuses the same thread id, urgency-aware windows apply.
+4. **Digest (F-B1):** when ≥2 high/critical toast-worthy events share `entity_id` or `(kind, repo)` within `digest_window_minutes` (default 10), the service MAY emit one digest toast instead of N singles. Prefer digest under bootloop. Target: M3 (earlier if cheap). Not a blocker for M2 basic toasts.
+5. Cold start: still no toast storm for pre-existing unread.
+
+**Consequences:** Critical repeats can surface; routine noise stays filtered. Normative algorithm: `docs/NOTIFICATIONS.md`.
+
+---
+
+## ADR-017 — Per-source refresh and late-result grace
+
+**Status:** Accepted  
+**Date:** 2026-09-26
+
+**Context:** Strict global “wait all / discard at 31s” causes yellow banners and hides already-fetched GitHub data when only GitLab is slow (VPN). Expert review: user is punished for minor delay.
+
+**Decision:**
+
+1. **Publish per source as ready:** when source A completes within timeout, Aggregator publishes an updated overview with A’s new snapshot immediately; in-flight sources keep prior snapshot / loading / last-good.
+2. **Per-source generation:** in-flight fetch tagged `(global_refresh_id, source_key, source_refresh_id)`. Completing an older `source_refresh_id` after a newer one started for the same source → discard.
+3. **Grace:** if the process returns after the 30s timeout but **before the next poll tick** and no newer fetch for that source started, accept the result (quiet UI update).
+4. Error banner for a source only if that source has no usable data — not because a sibling is slow.
+5. Global `refresh_id` remains for forced refresh and telemetry; it does not force all-or-nothing UI publish.
+
+**Consequences:** Matches error isolation. Softens the strictest early reading of ADR-013 without allowing stale generations to overwrite newer ones.
+
+---
+
+## ADR-018 — Auth recovery UX without plugin tokens
+
+**Status:** Accepted  
+**Date:** 2026-09-26
+
+**Context:** ADR-012 correctly clears privileged data on `auth_required`. Expert review: keyboard triage at list position N is destroyed; user must leave the panel, run CLI login elsewhere, return, and re-scroll. Tokens must not return to the plugin.
+
+**Decision:**
+
+1. **Empty auth state remains:** panel shows explicit `auth_required` — no ghost privileged rows.
+2. **Hotkey on auth empty state (M3 keyboard; soft-land allowed in M2):** default **`a`** = Authenticate. Argv-only launch of provider login in a terminal (`gh auth login` / `glab auth login` / `tea login`). Prefer `noctalia.runInTerminal` when present on the pinned Runtime API; otherwise documented argv form that opens the user terminal. **No password capture in the plugin.**
+3. After terminal session ends, service schedules a refresh; on success, privileged data loads normally.
+4. **Navigation restore:** while `auth_required`, panel/service MAY keep in RAM last focused `entity_id` (and optional section id). After re-auth, focus that entity if still present; else list top. Do not write this as a privileged last-good substitute on disk.
+5. Optional one-shot high toast on transition to `auth_required`; not a substitute for in-panel recovery.
+
+**Consequences:** Security model unchanged; professional keyboard flow survives session expiry.

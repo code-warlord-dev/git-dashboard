@@ -306,6 +306,7 @@ UI MUST prefer `error.code` / `state` over parsing `message`.
   "schema_version": 1,
   "published_at": 1727260000,
   "refresh_id": 42,
+  "note": "per-source source_refresh_id is service-internal (ADR-017); may appear on snapshot meta later",
   "mode": "all",
   "counts": {
     "attention": 5,

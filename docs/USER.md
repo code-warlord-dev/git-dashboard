@@ -35,3 +35,13 @@ High-urgency events can show desktop toasts. Configure under plugin settings:
 - action_scan_behavior
 
 Full schema in plugin.toml after M3.
+
+## Auth recovery
+
+If the panel shows **sign in required** (`auth_required`):
+
+1. Press **`a`** (when keyboard capture is active) — or run the CLI login yourself in a terminal.
+2. Complete `gh auth login` / `glab auth login` / `tea login` in the terminal that opens.
+3. Close the terminal; the dashboard refreshes. Focus returns to your previous item when possible.
+
+The plugin never stores tokens; it only reuses your existing CLI session.

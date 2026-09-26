@@ -2,7 +2,7 @@
 
 **Plugin:** `code-warlord-dev/git-dashboard`  
 **Status:** Living document — update only with ADR when behavior changes  
-**Last updated:** 2026-09-26 (M0.5 contract hardening)
+**Last updated:** 2026-09-26 (ADR-016…018) (M0.5 contract hardening)
 
 Requirements are identified as **REQ-\<area\>-\<nnn\>**.  
 Tests that prove them are **T-\<area\>-\<nn\>**.
@@ -127,10 +127,11 @@ Dynamic CLI invocations MUST use argv-form process execution (not shell-string i
 ### REQ-S-004 — Publish to state
 After aggregation, service MUST publish the unified overview to `noctalia.state` under a documented key (e.g. `dashboard`).
 
-### REQ-S-005 — Concurrency, timeout, generation (ADR-013)
+### REQ-S-005 — Concurrency, timeout, generation (ADR-013, ADR-017)
 Providers MAY be refreshed sequentially or with bounded concurrency (max 2 recommended).  
-Each refresh has a monotonic `refresh_id`; only results for the current accepted id may publish. Late results discarded.  
-Per-provider timeout default 30s; overall refresh budget default 60s. On timeout: `network_error` or keep last-good with `data_state=stale`.
+Global `refresh_id` plus **per-source** `source_refresh_id`: a completed source MAY be published immediately without waiting for slower sources.  
+Per-source timeout default 30s; optional grace until next poll tick for late results of the same source generation; overall wall budget default 90s.  
+On hard timeout for a source: `network_error` or last-good with `data_state=stale` **for that source only**. Older generation results after a newer fetch started for the same source MUST be discarded.
 
 **M1 implementation notes:** `Aggregator:begin_refresh()` issues the monotonic id,
 `Aggregator:accepts_generation(id)` and `Aggregator:publish(snapshots, id)` are the only
@@ -323,6 +324,12 @@ Tabs expand to `All | GitHub | GitLab` (and Gitea later).
 ### REQ-U-017 — Host switch (M6)
 `[` / `]` cycle hosts when multiple present.
 
+### REQ-U-018 — Auth recovery hotkey (ADR-018)
+When the focused panel shows `auth_required` empty state, a documented key (default **`a`**) MUST offer authenticate: argv-only launch of provider login in a terminal (`gh auth login` / equivalent). Plugin MUST NOT capture passwords or store tokens.
+
+### REQ-U-019 — Navigation restore after re-auth (ADR-018)
+Last focused `entity_id` MAY be kept in RAM across `auth_required`. After successful re-auth, panel SHOULD focus that entity if still present. Privileged list content MUST remain cleared while `auth_required`.
+
 ---
 
 ## 10. System Notifications (M2)
@@ -339,8 +346,8 @@ User MAY set `notifications.min_urgency`; only events ≥ that level produce toa
 ### REQ-N-004 — Enabled flag
 `notifications.enabled = false` suppresses all plugin toasts.
 
-### REQ-N-005 — Dedup
-Same item MUST NOT produce repeated toasts within a configurable window (default 30 min).
+### REQ-N-005 — Dedup (ADR-016)
+Same signal `id` MUST NOT produce repeated toasts within the **effective** window for its urgency (defaults: critical 5m, high 15m, normal/low 30m). Base setting `notifications.dedup_minutes` applies to normal/low; see NOTIFICATIONS.md.
 
 ### REQ-N-006 — Quiet hours
 Optional quiet hours suppress toasts (panel and badge still update).
@@ -350,6 +357,12 @@ Toast body MUST NOT contain tokens, private repo secrets, or full PR diffs.
 
 ### REQ-N-008 — Click action (MAY)
 If and only if the pinned Runtime API supports notification actions, toast click MAY open the panel or the item URL. Otherwise toasts are informational only. Not a blocker for M2.
+
+### REQ-N-009 — Digest on burst (ADR-016 / F-B1)
+When ≥2 high/critical toast-worthy events share entity or (kind, repo) in one evaluation or within digest window, the service MAY emit one digest toast instead of N singles. Target M3; optional earlier.
+
+### REQ-N-010 — Auth-lost toast
+Transition to `auth_required` MAY emit at most one high toast per source per session interval; panel banner is mandatory.
 
 **Tests:** T-N-001 … T-N-006.
 
@@ -376,6 +389,14 @@ Bool, default `true`. Whether CI failure signals may toast.
 
 ### REQ-C-014 — M2 settings declaration
 REQ-C-009…013 MUST be declared in `plugin.toml` `[[setting]]` in M2 so Noctalia Settings UI can edit them (not hard-coded only).
+
+
+### REQ-C-015 — Urgency-aware dedup settings (ADR-016)
+`notifications.dedup_minutes_high` (default 15), `notifications.dedup_minutes_critical` (default 5). MAY ship in M2 with notifications; MUST by M3.
+
+### REQ-C-016 — Digest settings (ADR-016)
+`notifications.digest_enabled` (default true), `notifications.digest_window_minutes` (default 10). Target M3 with REQ-N-009.
+
 
 ### M3+ settings
 

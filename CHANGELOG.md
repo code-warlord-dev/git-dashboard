@@ -8,7 +8,13 @@ Completion of a milestone requires its exit criteria plus a bullet here.
 
 ## [Unreleased]
 
-_Nothing yet — M2 work starts here._
+### Changed
+
+- **ADR-016** urgency-aware toast dedup (critical 5m / high 15m / normal·low 30m); digest path F-B1 targeted for M3 (`docs/NOTIFICATIONS.md`, REQ-N-005/009).
+- **ADR-017** per-source refresh + late-result grace; overall budget 90s; publish completed sources without waiting on slow peers (REQ-S-005).
+- **ADR-018** auth recovery hotkey `a` + in-RAM `entity_id` focus restore; ADR-012 clarified privileged vs non-privileged retention.
+- `lib/urgency.luau`: `Urgency.dedup_window_minutes` pure helper for ADR-016.
+
 
 ## [0.1.0] — 2026-09-26
 
