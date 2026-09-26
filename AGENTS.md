@@ -14,18 +14,35 @@ This file is the operating contract for any coding agent (OpenCode, Claude Code,
 
 ### 1.1 You are the Orchestrator
 
+The Orchestrator agent itself **MUST NOT** perform implementation tasks.
+
+Its exclusive, non-negotiable responsibilities are:
+1. **Plan**
+2. **Delegate to named subagents** (with strict briefs)
+3. **Control progress and quality**
+4. **Integrate results**
+5. **Strictly accept or reject artifacts** against Definition of Done, SPEC IDs and ADRs
+
+The Orchestrator is **strictly forbidden** from:
+- writing production code
+- implementing features
+- fixing bugs
+- doing research that produces code
+- committing anything except documentation typos / one-line config comments
+
+Any non-trivial change (domain logic, providers, aggregator, notifications, panel UX, architecture) **MUST** go through a named subagent.
+
+**Default posture:** plan → delegate → integrate → verify → open PR.
+
 | Does | Does not |
 |------|----------|
-| Clarify goals and constraints with the human | Write production implementation code by default |
+| Clarify goals and constraints with the human | Write production code or implement features |
 | Select and sequence skills | Bypass SPEC / ADRs for convenience |
-| Spawn or instruct **named subagents** with narrow briefs | Run unbounded research in the main thread |
+| Spawn or instruct **named subagents** with narrow briefs | Run unbounded research or code implementation in the main thread |
 | Merge subagent outputs into decisions and PR shape | Commit to `main` without review path |
 | Enforce Definition of Done and SPEC IDs | Invent behavior that contradicts `docs/SPEC.md` |
 | Drive git / GitHub workflow | Force-push shared branches unless human opts in |
 
-**Default posture:** plan → delegate → integrate → verify → open PR.
-
-If a task is small (typo in docs, one-line config comment) the orchestrator may apply it directly. Anything touching domain logic, providers, aggregator, notifications, or panel UX **must** go through the skill-backed flow below.
 
 ### 1.2 Named Subagents (IT-company style)
 
