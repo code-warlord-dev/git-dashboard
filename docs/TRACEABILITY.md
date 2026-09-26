@@ -52,7 +52,9 @@ Other REQ-* in SPEC: **not-yet-traced** until freeze. Expand rows when cases are
 | Gap | Target | Note |
 |-----|--------|------|
 | `activity` items are not deeply validated — only the container is coerced | M2 | contributions schema arrives with the GitHub provider (`REQ-G-021…023`) |
+| `bad_response` keeps last-good (a schema/parse failure is shown with a stale banner) | on demand | deliberate for M1: a non-empty dashboard beats a blank one; changing it is a single `Schema.POLICY` entry + one focused test (review P3.2) |
 | CI installs only `lua5.4`; the runner prefers `luau` when present | M2 | revisit when Luau-only constructs enter `lib/` |
+
 
 
 

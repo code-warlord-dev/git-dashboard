@@ -409,6 +409,19 @@ Shared status vocabulary (same markers in both files):
 Do not mark done on “code exists on a branch.” Close the milestone only when its exit
 criteria are checked, `PROGRESS.md` is complete, and a CHANGELOG bullet exists.
 
+### 13.2 Documentation badges must stay truthful
+
+The README badges are contract claims, not decoration:
+
+- `Tests` — must equal the case count printed by `scripts/run-domain-tests.sh`
+  (update it in the same PR that adds or removes cases);
+- `Version` — must match `docs/VERSION-MAP.md` (switch it to a dynamic
+  `github/v/tag` badge once the tag exists);
+- `CI` — GitHub-native workflow badge, never a hand-drawn "passing" badge.
+
+A stale badge is treated like a stale doc: fix it in the PR that made it stale.
+
+
 
 ---
 

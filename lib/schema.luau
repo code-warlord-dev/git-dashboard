@@ -75,6 +75,8 @@ Schema.STALE_WINDOW_SEC = 30 * 60
 Schema.LAST_GOOD_MAX_AGE_SEC = 24 * 60 * 60
 
 -- Which failures keep last-good on screen and which clear it.
+-- `ready = "fresh"` documents the intended non-failure outcome; `apply_failure`
+-- never receives a `ready` state (that path is `Schema.apply_success`).
 Schema.POLICY = {
     ready = "fresh",
     auth_required = "clear",
