@@ -33,7 +33,24 @@ Completion of a milestone requires its exit criteria plus a bullet here.
 
 - `docs/DATA-MODEL.md` §2/§6.1 — documented input aliasing and count semantics.
 - `docs/ARCHITECTURE.md` §4, `docs/COMPONENTS.md` — actual module layout + M1 status.
-- `docs/TRACEABILITY.md` — M1 rows moved `planned` → `covered`; M1.4 ids reserved.
+- `docs/TRACEABILITY.md` — M1 rows moved `planned` → `covered`; M1.4 ids reserved; known gaps listed.
+- `docs/ROADMAP.md` — progress markers legend, milestone/phase status, M1 exit criteria.
+- `docs/agent-state/{PROGRESS,SESSION}.md` — kept in sync with `main` after merge.
+
+### Fixed
+
+- `lib/schema.luau` — `is_array` treated an empty table as a non-array (review P2).
+- `lib/aggregator.luau` — attention-face selection is now fully order-independent
+  (equal rank + equal `updated_at` falls back to the smaller signal id).
+
+### Docs / process
+
+- `AGENTS.md` §13.1 — progress must always be recorded twice: `docs/agent-state/PROGRESS.md`
+  **and** the active `docs/ROADMAP.md` phase status / exit criteria; §6.2 got the
+  matching Definition-of-Done checkbox, §4 and §12.2 the matching sync step.
+- `README.md` — badges (license, domain-tests CI, Lua/Luau, milestone, schema) and a
+  title that reflects that the repository now ships implementation, not only docs.
+
 
 
 ## [0.0.0] — 2026-09-26

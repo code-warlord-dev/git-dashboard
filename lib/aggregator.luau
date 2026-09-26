@@ -224,6 +224,9 @@ usable sources contribute, so auth loss clears the queue (ADR-012).
 ]]
 local function collect_attention(entries)
     local by_entity, order = {}, {}
+    -- The id of the signal that currently owns the entity face. Kept in a side
+    -- table so the published entity stays plain contract data (no internal keys).
+    local face_ids = {}
     for _, entry in ipairs(entries) do
         if Schema.is_usable(entry.state, entry.data_state) then
             for _, item in ipairs(entry.items) do
@@ -248,11 +251,18 @@ local function collect_attention(entries)
                             }
                             by_entity[entity_id] = entity
                             order[#order + 1] = entity_id
+                            face_ids[entity_id] = tostring(item.id or "")
                         end
                         local item_rank = Urgency.rank(item.urgency)
                         local entity_rank = Urgency.rank(entity.urgency)
+                        local item_updated = item.updated_at or 0
+                        local item_id = tostring(item.id or "")
+                        -- Full ties are broken by the smaller signal id so the face
+                        -- never depends on intra-source item order.
                         local better = item_rank > entity_rank
-                            or (item_rank == entity_rank and (item.updated_at or 0) > (entity.updated_at or 0))
+                            or (item_rank == entity_rank and item_updated > entity.updated_at)
+                            or (item_rank == entity_rank and item_updated == entity.updated_at
+                                and item_id < (face_ids[entity_id] or ""))
                         if better then
                             entity.urgency = item.urgency
                             entity.title = item.title
@@ -261,10 +271,12 @@ local function collect_attention(entries)
                             entity.kind = item.kind
                             entity.provider = item.provider or entry.provider
                             entity.host = item.host or entry.host
+                            face_ids[entity_id] = item_id
                         end
-                        if (item.updated_at or 0) > (entity.updated_at or 0) then
-                            entity.updated_at = item.updated_at or 0
+                        if item_updated > entity.updated_at then
+                            entity.updated_at = item_updated
                         end
+
                         if not contains(entity.kinds, item.kind) then
                             entity.kinds[#entity.kinds + 1] = item.kind
                         end

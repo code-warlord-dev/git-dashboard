@@ -162,6 +162,7 @@ Orchestrator: if a planned skill is missing, put procedure in the subagent brief
 6. VERIFY          unit tests + smoke (collector + panel)
 7. REVIEW          plugin-spec-compliance + code-review (Quinn)
 8. SHIP            git branch → PR (GitHub) → self-review → merge to main
+9. SYNC            PROGRESS.md + ROADMAP.md phase status / exit criteria (§13.1)
 ```
 
 Never skip the design gate for changes to ProviderSnapshot, capabilities, aggregator, or notification urgency.
@@ -242,6 +243,7 @@ git commit -m "feat(scope): ..."
 - [ ] Tests for touched T-IDs
 - [ ] Skills/docs updated if workflow changed
 - [ ] CI green (when CI exists)
+- [ ] `docs/agent-state/PROGRESS.md` **and** the active `docs/ROADMAP.md` phase status / exit criteria updated (AGENTS.md §13.1)
 
 ### 6.3 Merge
 
@@ -369,7 +371,8 @@ PLAN     → update Next action + SPEC focus
 DELEGATE → brief cites SESSION.md paths
 INTEGRATE→ append Last artifact
 VERIFY   → note test result one-liner
-CLOSE    → update PROGRESS.md + SESSION.md Next action = idle or next ticket
+CLOSE    → update PROGRESS.md **and** ROADMAP.md (phase status + exit criteria);
+           SESSION.md Next action = idle or next ticket
 ```
 
 ---
@@ -378,12 +381,34 @@ CLOSE    → update PROGRESS.md + SESSION.md Next action = idle or next ticket
 
 | File | Role |
 |------|------|
-| `docs/ROADMAP.md` | Milestone definitions (normative intent) |
+| `docs/ROADMAP.md` | Milestone definitions (normative intent) + phase status + exit-criteria checkboxes |
 | `docs/agent-state/PROGRESS.md` | Executable checklist of done/in-progress/todo |
 | `docs/VERSION-MAP.md` | Versions ↔ milestones ↔ tags |
 
-Orchestrator updates checkboxes when a PR merges to `main`.  
-Do not mark done on “code exists on a branch.”
+### 13.1 Progress is always recorded twice
+
+**Non-negotiable.** Whenever work lands on `main`, the orchestrator updates **both**
+files — in the same PR when possible, otherwise in the immediate follow-up commit:
+
+1. `docs/agent-state/PROGRESS.md` — the executable checklist: what is done, what is next.
+2. `docs/ROADMAP.md` — the `Status` of the active milestone's phases **and** its
+   `Exit criteria` checkboxes.
+
+Updating only one is an incomplete update: `PROGRESS.md` alone hides milestone state
+from planners, `ROADMAP.md` alone hides the fine-grained next action. Record the phase
+(`M1.4`), the PR number and the verification one-liner (test count / CI job).
+
+Shared status vocabulary (same markers in both files):
+
+| Marker | Meaning |
+|--------|---------|
+| ✅ `done` | Merged to `main` and verified (tests / CI) |
+| 🟡 `in progress` | Branch or PR open, not merged |
+| ⬜ `planned` | Not started |
+
+Do not mark done on “code exists on a branch.” Close the milestone only when its exit
+criteria are checked, `PROGRESS.md` is complete, and a CHANGELOG bullet exists.
+
 
 ---
 

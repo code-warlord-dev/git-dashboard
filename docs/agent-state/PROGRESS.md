@@ -19,12 +19,16 @@ Updated: 2026-09-26 (after M1.1 + M1.2)
 - [ ] GitHub collector argv values filled (pre-M2)
 - [x] Luau test runner ADR-015 (minimal in-repo harness for M1)
 
-## M1 Domain (0.1.0)
-- [x] M1.1 Schema — `lib/schema.luau`, `lib/capabilities.luau`, `lib/errors.luau`, `lib/urgency.luau`
-- [x] M1.2 Aggregator — `lib/aggregator.luau` (merge, filter, counts, isolation, capability honesty)
-- [x] M1.3 Tests (part 1) — 29 cases: T-D-001…005, T-A-001…005 (`scripts/run-domain-tests.sh`, CI `domain-tests`)
+## M1 Domain (0.1.0) 🟡 in progress
+- [x] M1.1 Schema — `lib/schema.luau`, `lib/capabilities.luau`, `lib/errors.luau`, `lib/urgency.luau` (PR #2 → `main`)
+- [x] M1.2 Aggregator — `lib/aggregator.luau` (merge, filter, counts, isolation, capability honesty) (PR #2 → `main`)
+- [x] M1.3 Tests (part 1) — 29 cases: T-D-001…005, T-A-001…005 (`scripts/run-domain-tests.sh`, CI `domain-tests`) (PR #2 → `main`)
+- [x] Review follow-ups — `is_array` empty-table fix; deterministic attention-face tie-break (PR #2 → `main`)
 - [ ] M1.4 Stale policy window + refresh generation — T-A-006 (`REQ-S-005`/ADR-013), T-A-007 (`REQ-A-009`)
 - [ ] M1 exit criteria sign-off + tag `v0.1.0`
+
+Progress markers per AGENTS.md §13.1: ✅ done (merged + verified) · 🟡 in progress · ⬜ planned
+
 
 ## M2+
 - [ ] per ROADMAP after gates

@@ -72,9 +72,11 @@ local function is_integer(value)
     return type(value) == "number" and value % 1 == 0
 end
 
+-- Sequence-like table check: an empty table counts as an array (review P2).
 local function is_array(value)
-    return type(value) == "table" and #value > 0
+    return type(value) == "table" and (#value > 0 or next(value) == nil)
 end
+
 
 -- Fresh zeroed counter table.
 function Schema.new_counts()

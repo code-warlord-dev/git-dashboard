@@ -1,4 +1,12 @@
-# Git Dashboard for Noctalia — Full Documentation Package
+# Git Dashboard for Noctalia
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI — domain tests](https://github.com/code-warlord-dev/git-dashboard/actions/workflows/domain-tests.yml/badge.svg)](https://github.com/code-warlord-dev/git-dashboard/actions/workflows/domain-tests.yml)
+[![Lua / Luau](https://img.shields.io/badge/Lua-5.4%20%7C%20Luau-2C2D72?logo=lua&logoColor=white)](scripts/run-domain-tests.sh)
+[![Milestone](https://img.shields.io/badge/M1-domain%20core-brightgreen)](docs/ROADMAP.md)
+[![Schema](https://img.shields.io/badge/ProviderSnapshot-v1-blue)](docs/DATA-MODEL.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/code-warlord-dev/git-dashboard/pulls)
+[![Topics](https://img.shields.io/badge/topics-noctalia%20%7C%20luau%20%7C%20dashboard-informational)](https://github.com/code-warlord-dev/git-dashboard)
 
 **Canonical plugin id:** `code-warlord-dev/git-dashboard`  
 **Repository:** https://github.com/code-warlord-dev/git-dashboard  
