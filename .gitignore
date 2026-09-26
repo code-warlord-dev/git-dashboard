@@ -1,0 +1,18 @@
+# Local / runtime artifacts (never commit)
+*.log
+*.tmp
+*.bak
+.DS_Store
+.nvim.lua
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+
+# Lua / Luau build output
+luac.out
+*.luac
+
+# Local agent scratch (artifacts live in the repo, not here)
+/tmp/

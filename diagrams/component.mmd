@@ -1,0 +1,40 @@
+flowchart TB
+    subgraph Noctalia["Noctalia Shell 5"]
+        S[service.luau<br/>Core + orchestration]
+        W[widget.luau]
+        P[panel.luau<br/>All | GitHub | GitLab | Gitea]
+        ST[(noctalia.state)]
+        S <--> ST
+        W <--> ST
+        P <--> ST
+        W -->|togglePanel| P
+        P -->|onIpc mark/refresh| S
+    end
+
+    subgraph Core["Dashboard Core"]
+        AGG[DashboardAggregator]
+        CAP[Capabilities]
+        S --> AGG
+        AGG --> CAP
+    end
+
+    subgraph Providers["Providers"]
+        GH[GitHubProvider]
+        GL[GitLabProvider]
+        GE[GiteaProvider]
+        AGG --> GH
+        AGG --> GL
+        AGG --> GE
+    end
+
+    subgraph CLIs["CLI credential stores"]
+        GHC[gh]
+        GLC[glab]
+        TEC[tea]
+        GH --> GHC
+        GL --> GLC
+        GE --> TEC
+    end
+
+    Disk[(pluginDataDir)]
+    S --> Disk
