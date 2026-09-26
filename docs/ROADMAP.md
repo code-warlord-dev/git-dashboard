@@ -31,7 +31,7 @@ criteria carry a status. Updated only when work lands on `main`.
 |-----------|------|-------|----------------|--------|
 | **M0** | Foundations | Docs, AGENTS, skills, SPEC skeleton, ADRs | 0.0.0 | ✅ done (PR #1) |
 | **M0.5** | Contract hardening | ADR-009…014, audit fixes, honest inventory, gates | 0.0.0 | ✅ done (PR #1) |
-| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 | ✅ done (PR #2 + PR #3) — release PR #4, tag `v0.1.0` pending human ok |
+| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 | ✅ done — released and tagged `v0.1.0` |
 | **M2** | MVP Plugin + GitHub | service + widget + panel + GitHubProvider + system notifications | 0.2.0 | ⬜ planned (blocked on G-API-1…3 pin) |
 | **M3** | GitHub polish + Settings | Mark-read, Actions, contributions, keyboard, settings schema | 0.3.0 | ⬜ planned |
 | **M4** | GitLab | GitLabProvider, independent isolation, All | GitHub | GitLab tabs | 0.4.0 | ⬜ planned |
@@ -86,7 +86,7 @@ criteria carry a status. Updated only when work lands on `main`.
 - [x] Schema version field present *(T-D-001, PR #2)*
 - [x] Domain free of Noctalia and forge-specific types *(lib/ requires only siblings, PR #2)*
 
-**Remaining before the milestone closes:** release PR #4 (`chore(release): 0.1.0` — `CHANGELOG` 0.1.0 + VERSION-MAP) is open; the `v0.1.0` tag is created only on explicit human instruction (AGENTS.md §6.3).
+**Milestone closed:** M1.1–M1.4 merged, released in PR #4, and tagged `v0.1.0`. All exit criteria satisfied and proven by 42 unit tests.
 
 **Version:** 0.1.0 (domain lib / tests)
 

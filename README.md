@@ -1,7 +1,7 @@
 # Git Dashboard for Noctalia
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](docs/VERSION-MAP.md)
+[![Version](https://img.shields.io/github/v/tag/code-warlord-dev/git-dashboard?label=version&color=blue)](https://github.com/code-warlord-dev/git-dashboard/releases)
 [![Milestone](https://img.shields.io/badge/Milestone-M1%20domain%20core-brightgreen)](docs/ROADMAP.md)
 [![Schema](https://img.shields.io/badge/ProviderSnapshot-v1-blue)](docs/DATA-MODEL.md)
 [![Plugin](https://img.shields.io/badge/Noctalia-Shell%205.x-7aa2f7)](docs/API.md)
@@ -11,8 +11,8 @@
 [![Lua / Luau](https://img.shields.io/badge/Lua-5.4%20%7C%20Luau-2C2D72?logo=lua&logoColor=white)](scripts/run-domain-tests.sh)
 
 > The `Tests` badge and the `Version` badge are exact values, not decoration: the
-> test count comes from `scripts/run-domain-tests.sh` output and the version from
-> `docs/VERSION-MAP.md`. Keep them truthful (AGENTS.md §13.2).
+> test count comes from `scripts/run-domain-tests.sh` output and the version is
+> dynamically fetched from git tags. Keep them truthful (AGENTS.md §13.2).
 
 
 **Canonical plugin id:** `code-warlord-dev/git-dashboard`  
