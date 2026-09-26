@@ -8,6 +8,10 @@ Completion of a milestone requires its exit criteria plus a bullet here.
 
 ## [Unreleased]
 
+_Nothing yet — M2 work starts here._
+
+## [0.1.0] — 2026-09-26
+
 ### Added
 
 - **M1.1 domain schema** — `lib/schema.luau` (ProviderSnapshot v1: tolerant

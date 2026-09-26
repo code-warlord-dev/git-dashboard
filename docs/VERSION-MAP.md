@@ -5,8 +5,13 @@
 | 0.0.0 | — | M0 / M0.5 | any | docs + contract hardening |
 | 0.1.0 | v0.1.0 | M1 | — | domain lib / aggregator tests |
 
-**Status:** 0.1.0 is code-complete on `main` (M1.1–M1.4). The `v0.1.0` tag is issued by
-the release PR (`chore(release): 0.1.0`) after human approval — no tag on a branch.
+**Status:** 0.1.0 is on `main` (M1.1–M1.4, PR #2 + PR #3) and documented by release PR
+#4. The `v0.1.0` tag is created only on explicit human instruction (AGENTS.md §6.3) on
+the release PR merge commit — never from an agent branch.
+
+**After the tag:** switch the README `Version` badge to the dynamic
+`github/v/tag/code-warlord-dev/git-dashboard` badge (AGENTS.md §13.2).
+
 
 | 0.2.0 | v0.2.0 | M2 | **release pin required** | first loadable plugin, GitHub MVP, system notifications |
 | 0.3.0 | v0.3.0 | M3 | pin | mark-read, CI section, contributions, keyboard, full settings |

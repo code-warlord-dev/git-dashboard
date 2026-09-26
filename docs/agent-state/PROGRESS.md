@@ -19,13 +19,14 @@ Updated: 2026-09-26 (after M1.1 + M1.2)
 - [ ] GitHub collector argv values filled (pre-M2)
 - [x] Luau test runner ADR-015 (minimal in-repo harness for M1)
 
-## M1 Domain (0.1.0) ✅ code complete — release + tag pending
+## M1 Domain (0.1.0) ✅ code complete — release PR #4 open, tag pending human ok
 - [x] M1.1 Schema — `lib/schema.luau`, `lib/capabilities.luau`, `lib/errors.luau`, `lib/urgency.luau` (PR #2 → `main`)
 - [x] M1.2 Aggregator — `lib/aggregator.luau` (merge, filter, counts, isolation, capability honesty) (PR #2 → `main`)
 - [x] M1.3 Tests — 42 cases: T-D-001…005, T-A-001…007 (`scripts/run-domain-tests.sh`, CI `domain-tests`) (PR #2 + PR #3)
 - [x] M1.4 Stale policy — last-good window + `stale_expired`, retention helper, refresh generations + timeouts (PR #3)
-- [x] Review follow-ups — `is_array` empty-table fix; deterministic attention-face tie-break (PR #2)
-- [ ] Release: `chore(release): 0.1.0` PR (CHANGELOG + VERSION-MAP) and tag `v0.1.0` (human gate)
+- [x] Review follow-ups — `is_array` empty-table fix; deterministic attention-face tie-break; truthful README badges (`AGENTS.md §13.2`) (PR #2 + PR #3)
+- [ ] Tag `v0.1.0` on the release PR #4 merge commit — **explicit human instruction required**, then switch the version badge to dynamic
+
 
 Progress markers per AGENTS.md §13.1: ✅ done (merged + verified) · 🟡 in progress · ⬜ planned
 
