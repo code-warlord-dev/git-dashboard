@@ -149,11 +149,12 @@ Produces a **ProviderSnapshot**.
 - aggregation of snapshots
 - normalization
 - unified state for UI
-- filtering by provider / host
-- stale data policy
+- filtering by provider / host (pure, no re-fetch)
+- stale data policy — `Schema.apply_success` / `Schema.apply_failure`, `stale_expired`
 - provider capabilities exposure
-- common refresh lifecycle
+- common refresh lifecycle — generations (`begin_refresh` / `publish`) and timeouts
 - error isolation (one provider down ≠ whole dashboard down)
+
 
 ### 5.3 UI (widget + panel)
 
@@ -181,11 +182,17 @@ Never branches on provider string outside capability / kind helpers.
 ### 6.1 Service (singleton)
 
 - Owns poll timer via `noctalia.setUpdateInterval`
+- Opens every cycle with `aggregator:begin_refresh()`; results are published only
+  through `aggregator:publish(snapshots, refresh_id)` (ADR-013 — late results discarded)
 - Invokes providers (sequentially or bounded concurrency)
 - Runs collectors via `noctalia.runAsync({...}, cb)` (argv form)
+- Classifies failures/timeouts (`Errors.classify`) and applies
+  `Schema.apply_failure` per source — `PROVIDER_TIMEOUT_SEC` 30s, `REFRESH_BUDGET_SEC` 60s
 - Aggregates ProviderSnapshots → publishes to `noctalia.state`
-- Loads/saves last-good under `noctalia.pluginDataDir()`
+- Loads/saves last-good under `noctalia.pluginDataDir()`; drops entries older than
+  24h (`Schema.should_discard_last_good`)
 - Applies notification policy for new high-urgency items
+
 
 ### 6.2 Widget
 
@@ -210,16 +217,21 @@ Never branches on provider string outside capability / kind helpers.
 
 ```text
 Timer tick
+  → refresh_id = aggregator:begin_refresh()                 (ADR-013)
   → for each enabled provider:
       runAsync(collector argv)
         → parse stdout → ProviderSnapshot
-        → on error: classify state (auth / rate / network / …)
-  → Aggregator.merge(snapshots)
-  → publish noctalia.state["dashboard"] = overview
+        → on success: Schema.apply_success(snapshot, now)
+        → on error:   Errors.classify(failure) → Schema.apply_failure(...)
+                      (auth/unavailable clear; rate/network keep last-good + banner)
+        → on timeout: Aggregator.provider_timed_out → network_error → apply_failure
+  → aggregator:publish(snapshots, refresh_id) → overview     (late results discarded)
+  → noctalia.state["dashboard"] = overview
   → Notifications.evaluate(new items vs previous)
-  → optionally persist last-good
-Widget / Panel watch state → re-render
+  → persist last-good (entries older than 24h are not restored)
+Widget / Panel watch state → re-render (banner from Schema.staleness)
 ```
+
 
 ---
 

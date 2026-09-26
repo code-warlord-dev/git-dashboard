@@ -154,6 +154,7 @@ ProviderSnapshot = {
     state = "ready",               -- lifecycle state (see §7)
     data_state = "fresh",          -- "fresh" | "stale" | "empty"
     stale_since = nil,             -- unix sec when data became stale, if data_state=stale
+    stale_expired = nil,           -- true when last-good is older than the window (REQ-A-009)
 
     capabilities = { ... },        -- canonical keys only (§2)
 
@@ -240,6 +241,30 @@ Examples:
 - Success: `state=ready`, `data_state=fresh`
 - Rate limit with last-good: `state=rate_limited`, `data_state=stale`, `stale_since=…`
 - Auth loss: `state=auth_required`, `data_state=empty`, privileged items cleared, persisted snapshot invalidated (ADR-012)
+
+### 7.1 Failure policy (M1, REQ-A-009)
+
+`data_state` is **derived by the domain**, never guessed by a provider:
+`Schema.apply_success()` and `Schema.apply_failure()` are the only writers
+(`lib/schema.luau`).
+
+| Situation | `state` | `data_state` | served data |
+|-----------|---------|--------------|-------------|
+| successful fetch | `ready` | `fresh` | new items |
+| failure + last-good within `stale_window_sec` (default 30 min) | failure state | `stale` | last-good + banner |
+| failure + last-good older than the window | failure state | `stale`, `stale_expired = true` | last-good + "may be outdated" banner |
+| failure + nothing to serve | failure state | `empty` | nothing |
+| `auth_required` / `unavailable` | as-is | `empty` | nothing, privileged items dropped |
+
+**ADR-012 wins over REQ-A-009's optional behaviour:** an unauthenticated source is
+cleared immediately, even inside the window — private titles must not outlive a
+logout. For `rate_limited` / `network_error` / `api_error` last-good is preferred
+even past the window, with `stale_expired` telling the UI to say so.
+
+Banner input for the UI is `Schema.staleness(snapshot, now)` →
+`{ data_state, age_sec, stale_since, expired }`: no provider knowledge required
+(REQ-A-007).
+
 
 ---
 
@@ -364,6 +389,10 @@ On account/host switch: treat as different `source_key`; do not leak previous ac
 | `last_good_max_age_sec` | 86400 (24h) — older entries discarded on load |
 | `max_items_per_kind` | 100 |
 | `clear_on_auth_loss` | true (required) |
+
+`Schema.should_discard_last_good(snapshot, now, opts)` implements the first row so
+the service can drop an over-age persisted snapshot instead of merging it.
+
 
 ---
 

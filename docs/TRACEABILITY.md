@@ -22,7 +22,7 @@
 | REQ-D-006 | T-D-001, T-D-004, T-D-005 | M1 | covered |
 | REQ-D-007 | — | M1 | covered by construction (`lib/` imports no Noctalia and no forge SDK; reviewed per PR) |
 | REQ-D-008 | T-A-001 | M1 | covered |
-| REQ-D-009 | T-D-002 | M1 | covered |
+| REQ-D-009 | T-D-002, T-A-007 | M1 | covered |
 | REQ-D-010 | T-D-001 | M1 | covered |
 | REQ-A-001 | T-A-001 | M1 | covered |
 | REQ-A-002 | T-A-005 | M1 | covered |
@@ -32,8 +32,8 @@
 | REQ-A-006 | T-A-003 | M1 | covered |
 | REQ-A-007 | T-A-003 | M1 | covered |
 | REQ-A-008 | T-A-001 | M1 | covered |
-| REQ-A-009 | T-A-007 | M1.4 | planned |
-| REQ-S-005 | T-A-006 | M1.4 | planned |
+| REQ-A-009 | T-A-007 | M1 | covered |
+| REQ-S-005 | T-A-006 | M1 | covered |
 | REQ-S-007 | T-S-001 | M2 | planned |
 | REQ-C-009…014 | T-N-001… | M2 | planned |
 | REQ-N-001 | T-N-001 | M2 | planned |
@@ -45,15 +45,16 @@
 
 Other REQ-* in SPEC: **not-yet-traced** until freeze. Expand rows when cases are written. Never mark REQ done without a defined test when this matrix lists one.
 
-**Where the M1 cases live:** `tests/test_schema.luau` (T-D-*), `tests/test_aggregator.luau` (T-A-*), run through `scripts/run-domain-tests.sh` on every push and PR (`domain-tests` workflow). One `T-` id may cover several `REQ-*`; a case that cannot name its requirement is not counted here.
+**Where the M1 cases live:** `tests/test_schema.luau` (T-D-*), `tests/test_aggregator.luau` (T-A-001…005), `tests/test_stale_policy.luau` (T-A-006, T-A-007), run through `scripts/run-domain-tests.sh` on every push and PR (`domain-tests` workflow). One `T-` id may cover several `REQ-*`; a case that cannot name its requirement is not counted here.
 
 **Known gaps (tracked, not hidden):**
 
 | Gap | Target | Note |
 |-----|--------|------|
-| `activity` items are not deeply validated — only the container is coerced | M1.4 / M2 | contributions schema arrives with the GitHub provider (`REQ-G-021…023`) |
-| `REQ-A-009` last-good window | M1.4 | test id `T-A-007` reserved |
-| `REQ-S-005` / ADR-013 refresh generation (late-result discard) | M1.4 | test id `T-A-006` reserved |
+| `activity` items are not deeply validated — only the container is coerced | M2 | contributions schema arrives with the GitHub provider (`REQ-G-021…023`) |
+| `bad_response` keeps last-good (a schema/parse failure is shown with a stale banner) | on demand | deliberate for M1: a non-empty dashboard beats a blank one; changing it is a single `Schema.POLICY` entry + one focused test (review P3.2) |
 | CI installs only `lua5.4`; the runner prefers `luau` when present | M2 | revisit when Luau-only constructs enter `lib/` |
+
+
 
 

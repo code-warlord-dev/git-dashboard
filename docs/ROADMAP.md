@@ -31,7 +31,7 @@ criteria carry a status. Updated only when work lands on `main`.
 |-----------|------|-------|----------------|--------|
 | **M0** | Foundations | Docs, AGENTS, skills, SPEC skeleton, ADRs | 0.0.0 | ✅ done (PR #1) |
 | **M0.5** | Contract hardening | ADR-009…014, audit fixes, honest inventory, gates | 0.0.0 | ✅ done (PR #1) |
-| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 | 🟡 in progress (M1.1/M1.2 merged in PR #2; M1.4 open) |
+| **M1** | Domain Core | ProviderSnapshot, Aggregator, capabilities, error taxonomy, unit tests | 0.1.0 | ✅ done (PR #2 + PR #3); tag `v0.1.0` pending release PR |
 | **M2** | MVP Plugin + GitHub | service + widget + panel + GitHubProvider + system notifications | 0.2.0 | ⬜ planned (blocked on G-API-1…3 pin) |
 | **M3** | GitHub polish + Settings | Mark-read, Actions, contributions, keyboard, settings schema | 0.3.0 | ⬜ planned |
 | **M4** | GitLab | GitLabProvider, independent isolation, All | GitHub | GitLab tabs | 0.4.0 | ⬜ planned |
@@ -65,7 +65,7 @@ criteria carry a status. Updated only when work lands on `main`.
 
 ---
 
-### M1 — Domain Core (no UI yet)
+### M1 — Domain Core (no UI yet) ✅ done — PR #2 + PR #3
 
 **Goal:** Pure domain layer that can be unit-tested without Noctalia or network.
 
@@ -75,8 +75,8 @@ criteria carry a status. Updated only when work lands on `main`.
 |-------|--------|------------|--------|
 | M1.1 Schema | ProviderSnapshot schema v1, capability flags, error taxonomy | REQ-D-001 … REQ-D-010 | ✅ done — PR #2 |
 | M1.2 Aggregator | DashboardAggregator: merge, filter, counts, isolation | REQ-A-001 … REQ-A-008 | ✅ done — PR #2 |
-| M1.3 Tests | T-D-* and T-A-* unit tests (fixtures, no CLI) | T-D-001 … T-A-007 | 🟡 in progress — part 1 merged (T-D-001…005, T-A-001…005, 29 cases); T-A-006/T-A-007 with M1.4 |
-| M1.4 Stale policy | Last-good window, banner rules, refresh generation | REQ-A-009, REQ-S-005 | ⬜ planned |
+| M1.3 Tests | T-D-* and T-A-* unit tests (fixtures, no CLI) | T-D-001 … T-A-007 | ✅ done — 42 cases across PR #2 + PR #3 |
+| M1.4 Stale policy | Last-good window, banner rules, refresh generation | REQ-A-009, REQ-S-005 | ✅ done — PR #3 |
 
 **Exit criteria**
 
@@ -86,7 +86,7 @@ criteria carry a status. Updated only when work lands on `main`.
 - [x] Schema version field present *(T-D-001, PR #2)*
 - [x] Domain free of Noctalia and forge-specific types *(lib/ requires only siblings, PR #2)*
 
-**Remaining before the milestone closes:** M1.4 (`REQ-A-009` → `T-A-007`, `REQ-S-005`/ADR-013 → `T-A-006`), then tag `v0.1.0`.
+**Remaining before the milestone closes:** release PR (`chore(release): 0.1.0` — move `CHANGELOG` Unreleased to 0.1.0, VERSION-MAP) and tag `v0.1.0` (human gate).
 
 **Version:** 0.1.0 (domain lib / tests)
 
