@@ -117,6 +117,8 @@ criteria carry a status. Updated only when work lands on `main`.
 - [ ] Architecture already accepts additional providers without UI rewrite
 - [ ] No tokens stored by plugin
 
+> **P3 note:** reconcile wall budget 90s (SPEC REQ-S-005 / ADR-017) vs domain default `Aggregator.REFRESH_BUDGET_SEC = 60` — agree on a single source of truth in M2 service.
+
 **Version:** 0.2.0
 
 ---

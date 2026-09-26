@@ -38,14 +38,18 @@
 | REQ-C-009…014 | T-N-001… | M2 | planned |
 | REQ-N-001 | T-N-001 | M2 | planned |
 | REQ-N-003 | T-N-003 | M2 | planned |
-| REQ-N-005 | T-N-002 | M2 | planned |
+| REQ-N-005 | T-N-002, T-N-007, T-N-008 | M1/M2 | covered (domain windows) / planned (M2 toast path) |
+| REQ-N-009 | T-N-009 | M3 | planned |
 | REQ-G-008 | T-G-001 | M2 | planned |
 | REQ-G-009 | T-G-002 | M2 | planned |
 | REQ-G-013 | T-G-003 | M3 | planned |
+| REQ-U-018 | T-U-001 | M3 | planned |
+| REQ-U-019 | T-U-002 | M3 | planned |
+| REQ-C-015 | T-N-007 | M2/M3 | planned |
 
 Other REQ-* in SPEC: **not-yet-traced** until freeze. Expand rows when cases are written. Never mark REQ done without a defined test when this matrix lists one.
 
-**Where the M1 cases live:** `tests/test_schema.luau` (T-D-*), `tests/test_aggregator.luau` (T-A-001…005), `tests/test_stale_policy.luau` (T-A-006, T-A-007), run through `scripts/run-domain-tests.sh` on every push and PR (`domain-tests` workflow). One `T-` id may cover several `REQ-*`; a case that cannot name its requirement is not counted here.
+**Where the M1 cases live:** `tests/test_schema.luau` (T-D-*), `tests/test_aggregator.luau` (T-A-001…005), `tests/test_stale_policy.luau` (T-A-006, T-A-007), `tests/test_urgency_dedup.luau` (T-N-002/007/008 domain windows), run through `scripts/run-domain-tests.sh` on every push and PR (`domain-tests` workflow). One `T-` id may cover several `REQ-*`; a case that cannot name its requirement is not counted here.
 
 **Known gaps (tracked, not hidden):**
 
@@ -54,10 +58,3 @@ Other REQ-* in SPEC: **not-yet-traced** until freeze. Expand rows when cases are
 | `activity` items are not deeply validated — only the container is coerced | M2 | contributions schema arrives with the GitHub provider (`REQ-G-021…023`) |
 | `bad_response` keeps last-good (a schema/parse failure is shown with a stale banner) | on demand | deliberate for M1: a non-empty dashboard beats a blank one; changing it is a single `Schema.POLICY` entry + one focused test (review P3.2) |
 | CI installs only `lua5.4`; the runner prefers `luau` when present | M2 | revisit when Luau-only constructs enter `lib/` |
-
-| REQ-N-005 | T-N-002, T-N-007, T-N-008 | M2 | planned |
-| REQ-N-009 | T-N-009 | M3 | planned |
-| REQ-S-005 | T-A-006 (+ per-source cases) | M1/M2 | planned |
-| REQ-U-018 | T-U-001 | M3 | planned |
-| REQ-U-019 | T-U-002 | M3 | planned |
-| REQ-C-015 | T-N-007 | M2/M3 | planned |

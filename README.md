@@ -7,7 +7,7 @@
 [![Plugin](https://img.shields.io/badge/Noctalia-Shell%205.x-7aa2f7)](docs/API.md)
 [![Host](https://img.shields.io/badge/Host-Niri%20%2F%20compositor--agnostic-8A2BE2)](docs/VERSION-MAP.md)
 [![CI — domain tests](https://github.com/code-warlord-dev/git-dashboard/actions/workflows/domain-tests.yml/badge.svg)](https://github.com/code-warlord-dev/git-dashboard/actions/workflows/domain-tests.yml)
-[![Tests](https://img.shields.io/badge/tests-42%20passing-brightgreen)](scripts/run-domain-tests.sh)
+[![Tests](https://img.shields.io/badge/tests-46%20passing-brightgreen)](scripts/run-domain-tests.sh)
 [![Lua / Luau](https://img.shields.io/badge/Lua-5.4%20%7C%20Luau-2C2D72?logo=lua&logoColor=white)](scripts/run-domain-tests.sh)
 
 > The `Tests` badge and the `Version` badge are exact values, not decoration: the
@@ -106,7 +106,7 @@ plugin.toml     + service.luau / widget.luau / panel.luau (M2)
 ```
 
 **Status:** M1 (domain core — `lib/` and `tests/`) is implemented and covered by
-**42 cases** (`42 passed, 0 failed` on `lua5.4`, `lua` 5.5 and `luajit`). The
+**46 cases** (`46 passed, 0 failed` on `lua5.4`, `lua` 5.5 and `luajit`). The
 `v0.1.0` tag follows the release PR. M2 (plugin scaffold + GitHubProvider) is gated
 on the Noctalia pin (`docs/VERSION-MAP.md` G-API-1…3).
 
